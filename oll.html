@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rubik</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        main {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .rubik {
+            --active-piece: #eef124;
+            --gap-piece: -15px;
+            --height-piece: 8px;
+            --width-piece: 50px;
+            --border-piece: 3px;
+            --grid-gap: 4px;
+        }
+        .rubik.sm {
+            --gap-piece: -10px;
+            --height-piece: 4px;
+            --width-piece: 30px;
+            --grid-gap: 3px;
+        }
+        .rubik.xs {
+            --gap-piece: -4px;
+            --height-piece: 2px;
+            --width-piece: 10px;
+            --border-piece: 2px;
+            --grid-gap: 2px;
+        }
+        .rubik {
+            padding: calc(10px + var(--height-piece));
+            width: fit-content;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            grid-column-gap: var(--grid-gap);
+            grid-row-gap: var(--grid-gap);
+        }
+        .rubik > .piece {
+            width: var(--width-piece);
+            box-shadow: 0 0 0 var(--border-piece) rgb(73, 73, 73);
+            border-radius: 9%;
+            background-color: #d3d3c4;
+            position: relative;
+            aspect-ratio: 1/1;
+        }
+        .piece.p0 {
+            background-color: var(--active-piece);
+        }
+        .piece.p1::before,
+        .piece.p2::before,
+        .piece.p3::before,
+        .piece.p4::before {
+            content: '';
+            position: absolute;
+            width: var(--width-piece);
+            /* margin: 0 5px; */
+            height: var(--height-piece);
+            background-color: var(--active-piece);
+            box-shadow: 0 0 0 calc(var(--border-piece) - 1px) rgb(73, 73, 73);
+            border-radius: 7%;
+        }
+        .piece.p2::before,
+        .piece.p4::before {
+            width: var(--height-piece);
+            height: var(--width-piece);
+        }
+        .piece.p1::before {
+            top: var(--gap-piece);
+        }
+        .piece.p2::before {
+            right: var(--gap-piece);
+        }
+        .piece.p3::before {
+            bottom: var(--gap-piece);
+        }
+        .piece.p4::before {
+            left: var(--gap-piece);
+        }
+        b {
+            color: rgba(255, 255, 255, 0.1);
+            margin: 0 2px
+        }
+    </style>
+</head>
+<body>
+    <div class="text-center mb-4">
+        <h1 class="text-xl font-semibold">OLL - Rumus Cepat</h1>
+        <P>OLL adalah teknik rumus bagaimana menyelesaikan rubik lapisan atas menjadi full face color</P>
+    </div>
+
+    <main></main>
+    
+    <template>
+        <div class="rubik">
+            <div class="piece"></div>
+            <div class="piece"></div>
+            <div class="piece"></div>
+            <div class="piece"></div>
+            <div class="piece"></div>
+            <div class="piece"></div>
+            <div class="piece"></div>
+            <div class="piece"></div>
+            <div class="piece"></div>
+        </div>
+    </template>
+
+    <script>
+        const data = [
+            ['ikan',[
+                "401000300|L' U' L U' L' U2 L",
+                "102000003|R U R' U R U2 R'",
+                "400000302|R U2 R' U' R U' R'",
+                "002000403|L' U2 L U L' U L",
+                "001000302|R' U' R U' R' U2 R",
+                "401000002|L U2 L' U' L U' L'",
+
+            ]],
+            ['TANK',[
+                "000000303|R U R' U R U2 R2 U' R U' R' U2 R",
+                "101000000|R2 D' R U2 R' D R U2 R",
+                "100000300|r U R' U' L' U R U' x'",
+                "001000003|l' U' L U R U' L' U x'",
+            ]],
+            ['PLUS',[
+                "401000403|R U2 R2 U' R2 U' R2 U2 R",
+                "102000302|L' U2 L2 U R2 U L2 U2 L'",
+                "402000402|R U R' U R U' R' U R U2 R'",
+            ]],
+            ['P',[
+                "002002032|F U R U' R' F'",
+                "400400430|F' U' L' U L F",
+                "000400432|x U' L U r' U' L' U' L U L' U L",
+                "000002432|x U R' U' l U R U R' U' R U' R'",
+            ]],
+            ['T',[
+                "410000430|F R U R' U' F'",
+                "110000330|R U R' U' R' F R F'",
+            ]],
+            ['M/W',[
+                "100002032|R U R' U R U' R' U' R' F R F'",
+                "001400430|L' U' L U' L' U L U L F' L' F",
+            ]],
+            ['PITA',[
+                "002000300|x U R' U' L U R U' L' x'",
+                "400000003|x U' L U R' U' L' U R x'",
+                "100000002|x' U' R U L' U' R' U L x",
+                "001000400|x' U L' U' R U L U' R' x",
+            ]],
+            ['KOTAK',[
+                "400400332|r U2 R' U' R U' r'",
+                "002002433|l' U2 L U L' U l",
+            ]],
+            ['PETIR',[
+                "102002033|r U R' U R U2 r'",
+                "401400330|l' U' L U' L' U2 l",
+            ]],
+            ['Tanda Panah',[
+                "112002302|R B' R2 F R2 B R2 F' R",
+                "411400403|L' B L2 F' L2 B' L2 F L'",
+            ]],
+            ['strip',[
+                "112000332|F R U R' U' F'",
+            ]],
+        ]
+
+        const temRubik = document.querySelector('template')
+        const mainEl = document.querySelector('main')
+
+        function makeRubik(activePieces, size = '') {
+            const rubik = temRubik.content.cloneNode(true)
+            if(size) rubik.querySelector('.rubik').classList.add(size)
+            activePieces.forEach((pieceType, idx) => {
+                const pcEL = rubik.querySelector(`.piece:nth-child(${idx+1})`)
+                pcEL.classList.add('p' + pieceType)
+            });
+            return rubik
+        }
+
+        function makeRow(rubikMap, rumus) {
+            const div = document.createElement('div')
+            div.innerHTML = `<div class="bg-zinc-700">
+                <div class="flex items-center">
+                    <div class="bg-zinc-700"></div>
+                    <div class="text-white max-w-sm w-full text-center">${rumus.replaceAll(' ', '<b>&#x2022;</b>')}</div>
+                </div>
+                <hr class="w-[90%] mx-auto border-zinc-600" />
+            </div>`
+            div.firstElementChild.firstElementChild.firstElementChild.appendChild(makeRubik(rubikMap, 'xs'))
+            return div.firstElementChild
+        }
+
+        function makeGroup(name) {
+            const div = document.createElement('div')
+            div.innerHTML = `<div>
+                <div class="bg-yellow-300 text-center text-gray-900 uppercase py-2 font-semibold">${name}</div>
+                <div></div>
+            </div>`
+            div.firstElementChild.add = function(rubikMap, rumus) {
+                this.lastElementChild.appendChild(makeRow(rubikMap, rumus))
+            }
+            return div.firstElementChild
+        }
+        
+        data.forEach(d => {
+            const g = makeGroup(d[0])
+            d[1].forEach((r) => {
+                const [map, rumus] = r.split('|')
+                g.add(map.split(''), rumus)
+            });
+            mainEl.appendChild(g)
+        })
+    </script>
+</body>
+</html>
